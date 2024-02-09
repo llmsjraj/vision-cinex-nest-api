@@ -1,20 +1,24 @@
-import { Controller, Get, Param } from '@nestjs/common';
+// user.controller.ts
+import { Controller, Post, Body } from '@nestjs/common';
 import { UserService } from '../services/user.service';
-import { User } from '../schemas/user.schema';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SignupDto, SigninDto } from '../dto/user.dto';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('users')
 @Controller('users')
+@ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get(':id')
-  @ApiResponse({
-    status: 200,
-    description: 'The user with the specified ID.',
-    type: User,
-  })
-  async findOne(@Param('id') id: string): Promise<boolean> {
-    return await this.userService.exists(id);
+  @Post('signup')
+  @ApiResponse({ status: 201, description: 'User signed up successfully' })
+  async signup(@Body() signupDto: SignupDto): Promise<any> {
+    return this.userService.signup(signupDto);
+  }
+
+  @Post('signin')
+  @ApiResponse({ status: 200, description: 'User signed in successfully' })
+  async signin(@Body() signinDto: SigninDto): Promise<{ accessToken: string }> {
+    return this.userService.signin(signinDto);
   }
 }

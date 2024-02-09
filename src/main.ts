@@ -18,6 +18,7 @@ async function bootstrap() {
     .setTitle('Vision Cinex Test')
     .setDescription('API description for Vision Cinex Test')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

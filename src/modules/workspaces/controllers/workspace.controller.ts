@@ -11,11 +11,12 @@ import {
 import { WorkspaceService } from '../services/workspace.service';
 import { CreateWorkspaceDto, UpdateWorkspaceDto } from '../dto/workspace.dto';
 import { Workspace } from '../schemas/workspace.schema';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { User } from 'src/modules/users/interfaces/user.interface';
 
 @ApiTags('workspaces')
 @Controller('workspaces')
+@ApiBearerAuth()
 export class WorkspaceController {
   constructor(private readonly workspaceService: WorkspaceService) {}
 

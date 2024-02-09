@@ -10,10 +10,11 @@ import {
 import { MessageService } from '../services/message.service';
 import { CreateMessageDto, UpdateMessageDto } from '../dto/message.dto';
 import { Message } from '../schemas/message.schema';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('messages')
 @Controller('messages')
+@ApiBearerAuth()
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
