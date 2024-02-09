@@ -10,12 +10,19 @@ import {
 import { WorkspaceService } from '../services/workspace.service';
 import { CreateWorkspaceDto, UpdateWorkspaceDto } from '../dto/workspace.dto';
 import { Workspace } from '../schemas/workspace.schema';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('workspaces')
 @Controller('workspaces')
 export class WorkspaceController {
   constructor(private readonly workspaceService: WorkspaceService) {}
 
   @Post()
+  @ApiResponse({
+    status: 201,
+    description: 'The workspace has been successfully created.',
+    type: Workspace,
+  })
   async create(
     @Body() createWorkspaceDto: CreateWorkspaceDto,
   ): Promise<Workspace> {
@@ -23,16 +30,31 @@ export class WorkspaceController {
   }
 
   @Get()
+  @ApiResponse({
+    status: 200,
+    description: 'List of all workspaces.',
+    type: [Workspace],
+  })
   async findAll(): Promise<Workspace[]> {
     return await this.workspaceService.findAll();
   }
 
   @Get(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'The workspace with the specified ID.',
+    type: Workspace,
+  })
   async findOne(@Param('id') id: string): Promise<Workspace> {
     return await this.workspaceService.findOne(id);
   }
 
   @Put(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'The workspace has been successfully updated.',
+    type: Workspace,
+  })
   async update(
     @Param('id') id: string,
     @Body() updateWorkspaceDto: UpdateWorkspaceDto,
@@ -41,6 +63,11 @@ export class WorkspaceController {
   }
 
   @Delete(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'The workspace has been successfully deleted.',
+    type: Workspace,
+  })
   async remove(@Param('id') id: string): Promise<Workspace> {
     return await this.workspaceService.remove(id);
   }
