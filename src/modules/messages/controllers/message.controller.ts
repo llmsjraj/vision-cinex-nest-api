@@ -6,11 +6,12 @@ import {
   Param,
   Put,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { MessageService } from '../services/message.service';
 import { CreateMessageDto, UpdateMessageDto } from '../dto/message.dto';
 import { Message } from '../schemas/message.schema';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('messages')
 @Controller('messages')
@@ -69,5 +70,43 @@ export class MessageController {
   })
   async remove(@Param('id') id: string): Promise<Message> {
     return await this.messageService.remove(id);
+  }
+
+  @ApiQuery({
+    name: 'query',
+    description: 'Search query string',
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Search results returned successfully',
+    type: [Message],
+  })
+  @Get('search')
+  async searchMessages(@Query('query') query: string): Promise<Message[]> {
+    return this.messageService.searchMessages(query);
+  }
+
+  @ApiQuery({
+    name: 'date',
+    description: 'Filter messages by date',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'likes',
+    description: 'Filter messages by number of likes',
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Filtered messages returned successfully',
+    type: [Message],
+  })
+  @Get('filter')
+  async filterMessages(
+    @Query('date') date: string,
+    @Query('likes') likes: number,
+  ): Promise<Message[]> {
+    return this.messageService.filterMessages(date, likes);
   }
 }
