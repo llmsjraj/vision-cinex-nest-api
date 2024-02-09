@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, Request } from '@nestjs/common';
 import { UserService } from '../services/user.service';
-import { SignupDto, SigninDto } from '../dto/user.dto';
+import { SignupDto, SigninDto, SignupRespDto } from '../dto/user.dto';
 import {
   ApiBearerAuth,
   ApiResponse,
@@ -10,7 +10,10 @@ import {
   ApiNotFoundResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { User } from 'src/modules/users/interfaces/user.interface';
+import {
+  User,
+  UserWithoutPassword,
+} from 'src/modules/users/interfaces/user.interface';
 import { Workspace } from '../../workspaces/interfaces/workspace.interface';
 @ApiTags('users')
 @Controller('users')
@@ -19,10 +22,14 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('signup')
-  @ApiResponse({ status: 201, description: 'User signed up successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'User signed up successfully',
+    type: SignupRespDto,
+  })
   @ApiBadRequestResponse({ description: 'Bad request' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async signup(@Body() signupDto: SignupDto): Promise<any> {
+  async signup(@Body() signupDto: SignupDto): Promise<UserWithoutPassword> {
     return this.userService.signup(signupDto);
   }
 

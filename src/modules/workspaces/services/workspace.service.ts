@@ -33,19 +33,31 @@ export class WorkspaceService {
   }
 
   async findOne(id: string): Promise<Workspace> {
-    return await this.workspaceModel.findById(id).exec();
+    const workspace = await this.workspaceModel.findById(id).exec();
+    if (!workspace) {
+      throw new NotFoundException('Workspace not found');
+    }
+    return workspace;
   }
 
   async update(
     id: string,
     updateWorkspaceDto: UpdateWorkspaceDto,
   ): Promise<Workspace> {
-    return await this.workspaceModel
+    const workspace = await this.workspaceModel
       .findByIdAndUpdate(id, updateWorkspaceDto, { new: true })
       .exec();
+    if (!workspace) {
+      throw new NotFoundException('Workspace not found');
+    }
+    return workspace;
   }
 
   async remove(id: string): Promise<Workspace> {
-    return await this.workspaceModel.findByIdAndDelete(id).exec();
+    const workspace = await this.workspaceModel.findByIdAndDelete(id).exec();
+    if (!workspace) {
+      throw new NotFoundException('Workspace not found');
+    }
+    return workspace;
   }
 }

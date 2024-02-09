@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,6 +17,7 @@ import {
 } from '../../workspaces/schemas/workspace.schema';
 
 import { Workspace as WorkspaceInt } from '../../workspaces/interfaces/workspace.interface';
+import { UserWithoutPassword } from '../interfaces/user.interface';
 @Injectable()
 export class UserService {
   constructor(
@@ -25,7 +27,7 @@ export class UserService {
     private readonly authService: AuthService,
   ) {}
 
-  async signup(signupDto: SignupDto): Promise<User> {
+  async signup(signupDto: SignupDto): Promise<UserWithoutPassword> {
     // Check if a user with the provided login already exists
     const existingUser = await this.userModel
       .findOne({ login: signupDto.login })
@@ -33,13 +35,22 @@ export class UserService {
     if (existingUser) {
       throw new ConflictException('User with this login already exists');
     }
+
     const hashedPassword = await bcrypt.hash(signupDto.password, 10);
     const newUser = new this.userModel({
       name: signupDto.name,
       login: signupDto.login,
       password: hashedPassword,
     });
-    return newUser.save();
+
+    const savedUser = await newUser.save();
+
+    // Directly return the relevant fields without including password
+    return {
+      name: savedUser.name,
+      login: savedUser.login,
+      _id: savedUser._id,
+    };
   }
 
   async signin(signinDto: SigninDto): Promise<{ accessToken: string }> {
@@ -62,10 +73,18 @@ export class UserService {
 
   async exists(userId: string): Promise<boolean> {
     const user = await this.userModel.findById(userId).exec();
-    return !!user;
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return true;
   }
 
   async getUserWorkspaces(userId: string): Promise<WorkspaceInt[]> {
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
     return await this.workspaceModel
       .aggregate([
         {

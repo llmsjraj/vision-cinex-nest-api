@@ -36,24 +36,40 @@ export class MessageService {
   }
 
   async findAllByWorkspace(workspaceId: string): Promise<Message[]> {
-    return await this.messageModel.find({ workspaceId }).exec();
+    const messages = await this.messageModel.find({ workspaceId }).exec();
+    if (!messages || messages.length === 0) {
+      throw new NotFoundException('No messages found for this workspace');
+    }
+    return messages;
   }
 
   async findOne(id: string): Promise<Message> {
-    return await this.messageModel.findById(id).exec();
+    const message = await this.messageModel.findById(id).exec();
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+    return message;
   }
 
   async update(
     id: string,
     updateMessageDto: UpdateMessageDto,
   ): Promise<Message> {
-    return await this.messageModel
+    const message = await this.messageModel
       .findByIdAndUpdate(id, updateMessageDto, { new: true })
       .exec();
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+    return message;
   }
 
   async remove(id: string): Promise<Message> {
-    return await this.messageModel.findByIdAndDelete(id).exec();
+    const message = await this.messageModel.findByIdAndDelete(id).exec();
+    if (!message) {
+      throw new NotFoundException('Message not found');
+    }
+    return message;
   }
 
   async searchMessages(query: string): Promise<Message[]> {
