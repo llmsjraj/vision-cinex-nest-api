@@ -13,6 +13,7 @@ import { CreateWorkspaceDto, UpdateWorkspaceDto } from '../dto/workspace.dto';
 import { Workspace } from '../schemas/workspace.schema';
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { User } from 'src/modules/users/interfaces/user.interface';
+import { IdParam } from 'src/common/not-empty-param.dto';
 
 @ApiTags('workspaces')
 @Controller('workspaces')
@@ -35,7 +36,7 @@ export class WorkspaceController {
   @Get()
   @ApiResponse({
     status: 200,
-    description: 'List of all workspaces.',
+    description: 'List of all workspaces by user.',
     type: [Workspace],
   })
   async findAll(@Request() req: { user: User }): Promise<Workspace[]> {
@@ -48,8 +49,8 @@ export class WorkspaceController {
     description: 'The workspace with the specified ID.',
     type: Workspace,
   })
-  async findOne(@Param('id') id: string): Promise<Workspace> {
-    return await this.workspaceService.findOne(id);
+  async findOne(@Param() params: IdParam): Promise<Workspace> {
+    return await this.workspaceService.findOne(params.id);
   }
 
   @Put(':id')
@@ -59,10 +60,10 @@ export class WorkspaceController {
     type: Workspace,
   })
   async update(
-    @Param('id') id: string,
+    @Param() params: IdParam,
     @Body() updateWorkspaceDto: UpdateWorkspaceDto,
   ): Promise<Workspace> {
-    return await this.workspaceService.update(id, updateWorkspaceDto);
+    return await this.workspaceService.update(params.id, updateWorkspaceDto);
   }
 
   @Delete(':id')
@@ -71,7 +72,7 @@ export class WorkspaceController {
     description: 'The workspace has been successfully deleted.',
     type: Workspace,
   })
-  async remove(@Param('id') id: string): Promise<Workspace> {
-    return await this.workspaceService.remove(id);
+  async remove(@Param() params: IdParam): Promise<Workspace> {
+    return await this.workspaceService.remove(params.id);
   }
 }

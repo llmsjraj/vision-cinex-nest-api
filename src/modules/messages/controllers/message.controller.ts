@@ -12,6 +12,7 @@ import { MessageService } from '../services/message.service';
 import { CreateMessageDto, UpdateMessageDto } from '../dto/message.dto';
 import { Message } from '../schemas/message.schema';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { IdParam, WorkspaceParam } from 'src/common/not-empty-param.dto';
 
 @ApiTags('messages')
 @Controller('messages')
@@ -35,8 +36,8 @@ export class MessageController {
     description: 'List of all messages.',
     type: [Message],
   })
-  async findAll(@Param('workspaceId') workspaceId: string): Promise<Message[]> {
-    return await this.messageService.findAllByWorkspace(workspaceId);
+  async findAll(@Param() params: WorkspaceParam): Promise<Message[]> {
+    return await this.messageService.findAllByWorkspace(params.workspaceId);
   }
 
   @Get(':id')
@@ -45,8 +46,8 @@ export class MessageController {
     description: 'The message with the specified ID.',
     type: Message,
   })
-  async findOne(@Param('id') id: string): Promise<Message> {
-    return await this.messageService.findOne(id);
+  async findOne(@Param() params: IdParam): Promise<Message> {
+    return await this.messageService.findOne(params.id);
   }
 
   @Put(':id')
@@ -56,10 +57,10 @@ export class MessageController {
     type: Message,
   })
   async update(
-    @Param('id') id: string,
+    @Param() params: IdParam,
     @Body() updateMessageDto: UpdateMessageDto,
   ): Promise<Message> {
-    return await this.messageService.update(id, updateMessageDto);
+    return await this.messageService.update(params.id, updateMessageDto);
   }
 
   @Delete(':id')
@@ -68,8 +69,8 @@ export class MessageController {
     description: 'The message has been successfully deleted.',
     type: Message,
   })
-  async remove(@Param('id') id: string): Promise<Message> {
-    return await this.messageService.remove(id);
+  async remove(@Param() params: IdParam): Promise<Message> {
+    return await this.messageService.remove(params.id);
   }
 
   @ApiQuery({

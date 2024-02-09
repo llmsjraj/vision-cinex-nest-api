@@ -1,24 +1,26 @@
-import { IsNotEmpty, IsUUID, Matches } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
 export class WorkspaceParam {
   @ApiProperty({
     required: true,
-    example: '123e4567-e89b-12d3-a456-426614174000',
+    example: '65c62fca677dcad184eda1bf',
   })
   @IsNotEmpty()
-  @IsUUID('4', { message: 'Invalid UUID format' })
+  @IsString()
+  @IsMongoId({ message: 'Invalid ID' })
   workspaceId: string;
 }
 
 export class IdParam {
   @ApiProperty({
     required: true,
-    example: '123e4567-e89b-12d3-a456-426614174000',
+    example: '65c62fca677dcad184eda1bf',
   })
   @IsNotEmpty()
-  @IsUUID('4', { message: 'Invalid UUID format' })
+  @IsString()
+  @IsMongoId({ message: 'Invalid ID' })
   id: string;
 }
 
