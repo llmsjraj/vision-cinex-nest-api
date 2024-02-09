@@ -3,6 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { PassportModule } from '@nestjs/passport';
+import { APP_FILTER } from '@nestjs/core';
+import { GlobalExceptionHandler } from 'src/common/exception-handler/global-exception-handler';
 
 @Module({
   imports: [
@@ -12,6 +14,11 @@ import { PassportModule } from '@nestjs/passport';
     PassportModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionHandler,
+    },
+  ],
 })
 export class AppModule {}
