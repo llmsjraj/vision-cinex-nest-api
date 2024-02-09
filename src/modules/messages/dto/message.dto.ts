@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsInt, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, Min, IsUUID } from 'class-validator';
 
 export class CreateMessageDto {
   @ApiProperty({
-    description: 'The ID of the workspace for the message.',
-    example: 'workspace123',
+    description: 'The ID of the workspace for the message (GUID).',
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @IsNotEmpty()
-  @IsString()
+  @IsUUID('4', { message: 'Invalid UUID format' })
   readonly workspaceId: string;
 
   @ApiProperty({

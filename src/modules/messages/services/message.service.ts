@@ -1,17 +1,37 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Message, MessageDocument } from '../schemas/message.schema';
 import { CreateMessageDto, UpdateMessageDto } from '../dto/message.dto';
 import { parseISO, isValid } from 'date-fns';
+import {
+  Workspace,
+  WorkspaceDocument,
+} from 'src/modules/workspaces/schemas/workspace.schema';
 
 @Injectable()
 export class MessageService {
   constructor(
-    @InjectModel(Message.name) private messageModel: Model<MessageDocument>,
+    @InjectModel(Message.name)
+    private readonly messageModel: Model<MessageDocument>,
+    @InjectModel(Workspace.name)
+    private readonly workspaceModel: Model<WorkspaceDocument>,
   ) {}
 
   async create(createMessageDto: CreateMessageDto): Promise<Message> {
+    // Check if workspaceId exists
+    const workspace = await this.workspaceModel.findById(
+      createMessageDto.workspaceId,
+    );
+    if (!workspace) {
+      throw new NotFoundException('Workspace not found');
+    }
+
+    // Create and save the message
     const currentDate = new Date();
     const createdMessage = new this.messageModel({
       ...createMessageDto,
