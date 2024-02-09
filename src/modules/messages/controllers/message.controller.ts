@@ -11,7 +11,16 @@ import {
 import { MessageService } from '../services/message.service';
 import { CreateMessageDto, UpdateMessageDto } from '../dto/message.dto';
 import { Message } from '../schemas/message.schema';
-import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+  ApiBadRequestResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import {
   FilterQuery,
   IdParam,
@@ -31,6 +40,8 @@ export class MessageController {
     description: 'The message has been successfully created.',
     type: Message,
   })
+  @ApiBadRequestResponse({ description: 'Bad request' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   async create(@Body() createMessageDto: CreateMessageDto): Promise<Message> {
     return await this.messageService.create(createMessageDto);
   }
@@ -45,6 +56,10 @@ export class MessageController {
     description: 'Search results returned successfully',
     type: [Message],
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized request' })
+  @ApiBadRequestResponse({ description: 'Bad request' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   @Get('search')
   async searchMessages(@Query() query: SearchQuery): Promise<Message[]> {
     return this.messageService.searchMessages(query.query);
@@ -65,6 +80,10 @@ export class MessageController {
     description: 'Filtered messages returned successfully',
     type: [Message],
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized request' })
+  @ApiBadRequestResponse({ description: 'Bad request' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   @Get('filter')
   async filterMessages(@Query() query: FilterQuery): Promise<Message[]> {
     return this.messageService.filterMessages(query.date, query.likes);
@@ -76,6 +95,9 @@ export class MessageController {
     description: 'List of all messages.',
     type: [Message],
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized request' })
+  @ApiNotFoundResponse({ description: 'Resource not found' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   async findAll(@Param() params: WorkspaceParam): Promise<Message[]> {
     return await this.messageService.findAllByWorkspace(params.workspaceId);
   }
@@ -86,6 +108,9 @@ export class MessageController {
     description: 'The message with the specified ID.',
     type: Message,
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized request' })
+  @ApiNotFoundResponse({ description: 'Message not found' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   async findOne(@Param() params: IdParam): Promise<Message> {
     return await this.messageService.findOne(params.id);
   }
@@ -96,6 +121,10 @@ export class MessageController {
     description: 'The message has been successfully updated.',
     type: Message,
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized request' })
+  @ApiNotFoundResponse({ description: 'Message not found' })
+  @ApiBadRequestResponse({ description: 'Bad request' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   async update(
     @Param() params: IdParam,
     @Body() updateMessageDto: UpdateMessageDto,
@@ -109,6 +138,9 @@ export class MessageController {
     description: 'The message has been successfully deleted.',
     type: Message,
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized request' })
+  @ApiNotFoundResponse({ description: 'Message not found' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   async remove(@Param() params: IdParam): Promise<Message> {
     return await this.messageService.remove(params.id);
   }

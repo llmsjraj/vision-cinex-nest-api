@@ -15,6 +15,7 @@ import {
   WorkspaceDocument,
 } from '../../workspaces/schemas/workspace.schema';
 
+import { Workspace as WorkspaceInt } from '../../workspaces/interfaces/workspace.interface';
 @Injectable()
 export class UserService {
   constructor(
@@ -64,7 +65,7 @@ export class UserService {
     return !!user;
   }
 
-  async getUserWorkspaces(userId: string): Promise<any[]> {
+  async getUserWorkspaces(userId: string): Promise<WorkspaceInt[]> {
     return await this.workspaceModel
       .aggregate([
         {

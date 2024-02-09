@@ -11,7 +11,15 @@ import {
 import { WorkspaceService } from '../services/workspace.service';
 import { CreateWorkspaceDto, UpdateWorkspaceDto } from '../dto/workspace.dto';
 import { Workspace } from '../schemas/workspace.schema';
-import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiInternalServerErrorResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { User } from 'src/modules/users/interfaces/user.interface';
 import { IdParam } from 'src/common/not-empty-param.dto';
 
@@ -27,6 +35,9 @@ export class WorkspaceController {
     description: 'The workspace has been successfully created.',
     type: Workspace,
   })
+  @ApiBadRequestResponse({ description: 'Bad request' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized request' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   async create(
     @Body() createWorkspaceDto: CreateWorkspaceDto,
   ): Promise<Workspace> {
@@ -39,6 +50,9 @@ export class WorkspaceController {
     description: 'List of all workspaces by user.',
     type: [Workspace],
   })
+  @ApiBadRequestResponse({ description: 'Bad request' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized request' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   async findAll(@Request() req: { user: User }): Promise<Workspace[]> {
     return await this.workspaceService.findAllByUser(req.user.userId);
   }
@@ -49,6 +63,10 @@ export class WorkspaceController {
     description: 'The workspace with the specified ID.',
     type: Workspace,
   })
+  @ApiBadRequestResponse({ description: 'Bad request' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized request' })
+  @ApiNotFoundResponse({ description: 'Workspace not found' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   async findOne(@Param() params: IdParam): Promise<Workspace> {
     return await this.workspaceService.findOne(params.id);
   }
@@ -59,6 +77,10 @@ export class WorkspaceController {
     description: 'The workspace has been successfully updated.',
     type: Workspace,
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized request' })
+  @ApiNotFoundResponse({ description: 'Workspace not found' })
+  @ApiBadRequestResponse({ description: 'Bad request' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   async update(
     @Param() params: IdParam,
     @Body() updateWorkspaceDto: UpdateWorkspaceDto,
@@ -72,6 +94,10 @@ export class WorkspaceController {
     description: 'The workspace has been successfully deleted.',
     type: Workspace,
   })
+  @ApiBadRequestResponse({ description: 'Bad request' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized request' })
+  @ApiNotFoundResponse({ description: 'Workspace not found' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   async remove(@Param() params: IdParam): Promise<Workspace> {
     return await this.workspaceService.remove(params.id);
   }
