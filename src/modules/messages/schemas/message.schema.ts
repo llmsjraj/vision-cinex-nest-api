@@ -14,7 +14,7 @@ export class Message {
   @Prop({ default: 0 })
   likes: number;
 
-  @Prop({ required: true })
+  @Prop({ required: true, index: 'text' })
   content: string;
 }
 

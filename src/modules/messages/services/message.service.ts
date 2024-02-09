@@ -1,13 +1,8 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Message, MessageDocument } from '../schemas/message.schema';
 import { CreateMessageDto, UpdateMessageDto } from '../dto/message.dto';
-import { parseISO, isValid } from 'date-fns';
 import {
   Workspace,
   WorkspaceDocument,
@@ -65,22 +60,23 @@ export class MessageService {
     return await this.messageModel.find({ $text: { $search: query } }).exec();
   }
 
-  async filterMessages(dateString: string, likes: number): Promise<Message[]> {
+  async filterMessages(date: Date, likes: number): Promise<Message[]> {
     const query = {};
-    if (dateString) {
-      const date = parseISO(dateString);
-      if (isValid(date)) {
-        query['date'] = {
-          $gte: date,
-          $lt: new Date(date.getTime() + 86400000),
-        }; // Assuming you want messages for the whole day
-      } else {
-        throw new BadRequestException('Invalid date format');
-      }
+
+    if (date) {
+      const nextDay = new Date(date);
+      nextDay.setDate(nextDay.getDate() + 1);
+
+      query['date'] = {
+        $gte: date,
+        $lt: nextDay,
+      };
     }
-    if (likes !== undefined && likes !== null) {
+
+    if (likes !== undefined) {
       query['likes'] = likes;
     }
+
     return await this.messageModel.find(query).exec();
   }
 }

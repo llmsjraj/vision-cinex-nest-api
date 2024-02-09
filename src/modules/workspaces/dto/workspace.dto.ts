@@ -1,13 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateWorkspaceDto {
   @ApiProperty({
     description: 'The user ID for the workspace.',
-    example: 'user123',
+    example: '65c62fca677dcad184eda1bf',
   })
   @IsNotEmpty()
   @IsString()
+  @IsMongoId({ message: 'Invalid userId' })
   readonly userId: string;
 
   @ApiProperty({

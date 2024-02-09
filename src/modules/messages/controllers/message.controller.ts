@@ -12,7 +12,12 @@ import { MessageService } from '../services/message.service';
 import { CreateMessageDto, UpdateMessageDto } from '../dto/message.dto';
 import { Message } from '../schemas/message.schema';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { IdParam, WorkspaceParam } from 'src/common/not-empty-param.dto';
+import {
+  FilterQuery,
+  IdParam,
+  SearchQuery,
+  WorkspaceParam,
+} from 'src/common/not-empty-param.dto';
 
 @ApiTags('messages')
 @Controller('messages')
@@ -28,6 +33,41 @@ export class MessageController {
   })
   async create(@Body() createMessageDto: CreateMessageDto): Promise<Message> {
     return await this.messageService.create(createMessageDto);
+  }
+
+  @ApiQuery({
+    name: 'query',
+    description: 'Search query string',
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Search results returned successfully',
+    type: [Message],
+  })
+  @Get('search')
+  async searchMessages(@Query() query: SearchQuery): Promise<Message[]> {
+    return this.messageService.searchMessages(query.query);
+  }
+
+  @ApiQuery({
+    name: 'date',
+    description: 'Filter messages by date',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'likes',
+    description: 'Filter messages by number of likes',
+    required: false,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Filtered messages returned successfully',
+    type: [Message],
+  })
+  @Get('filter')
+  async filterMessages(@Query() query: FilterQuery): Promise<Message[]> {
+    return this.messageService.filterMessages(query.date, query.likes);
   }
 
   @Get(':workspaceId')
@@ -71,43 +111,5 @@ export class MessageController {
   })
   async remove(@Param() params: IdParam): Promise<Message> {
     return await this.messageService.remove(params.id);
-  }
-
-  @ApiQuery({
-    name: 'query',
-    description: 'Search query string',
-    required: false,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Search results returned successfully',
-    type: [Message],
-  })
-  @Get('search')
-  async searchMessages(@Query('query') query: string): Promise<Message[]> {
-    return this.messageService.searchMessages(query);
-  }
-
-  @ApiQuery({
-    name: 'date',
-    description: 'Filter messages by date',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'likes',
-    description: 'Filter messages by number of likes',
-    required: false,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Filtered messages returned successfully',
-    type: [Message],
-  })
-  @Get('filter')
-  async filterMessages(
-    @Query('date') date: string,
-    @Query('likes') likes: number,
-  ): Promise<Message[]> {
-    return this.messageService.filterMessages(date, likes);
   }
 }
