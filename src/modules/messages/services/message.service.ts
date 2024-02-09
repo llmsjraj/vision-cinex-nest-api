@@ -19,8 +19,8 @@ export class MessageService {
     return await createdMessage.save();
   }
 
-  async findAll(): Promise<Message[]> {
-    return await this.messageModel.find().exec();
+  async findAllByWorkspace(workspaceId: string): Promise<Message[]> {
+    return await this.messageModel.find({ workspaceId }).exec();
   }
 
   async findOne(id: string): Promise<Message> {

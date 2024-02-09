@@ -6,11 +6,13 @@ import {
   Param,
   Put,
   Delete,
+  Request,
 } from '@nestjs/common';
 import { WorkspaceService } from '../services/workspace.service';
 import { CreateWorkspaceDto, UpdateWorkspaceDto } from '../dto/workspace.dto';
 import { Workspace } from '../schemas/workspace.schema';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { User } from 'src/modules/users/interfaces/user.interface';
 
 @ApiTags('workspaces')
 @Controller('workspaces')
@@ -35,8 +37,8 @@ export class WorkspaceController {
     description: 'List of all workspaces.',
     type: [Workspace],
   })
-  async findAll(): Promise<Workspace[]> {
-    return await this.workspaceService.findAll();
+  async findAll(@Request() req: { user: User }): Promise<Workspace[]> {
+    return await this.workspaceService.findAllByUser(req.user.userId);
   }
 
   @Get(':id')

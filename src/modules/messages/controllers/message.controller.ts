@@ -27,14 +27,14 @@ export class MessageController {
     return await this.messageService.create(createMessageDto);
   }
 
-  @Get()
+  @Get(':workspaceId')
   @ApiResponse({
     status: 200,
     description: 'List of all messages.',
     type: [Message],
   })
-  async findAll(): Promise<Message[]> {
-    return await this.messageService.findAll();
+  async findAll(@Param('workspaceId') workspaceId: string): Promise<Message[]> {
+    return await this.messageService.findAllByWorkspace(workspaceId);
   }
 
   @Get(':id')
