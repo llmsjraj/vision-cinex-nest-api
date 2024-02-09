@@ -6,11 +6,17 @@ import { User, UserDocument } from '../schemas/user.schema';
 import { SignupDto } from '../dto/user.dto';
 import { SigninDto } from '../dto/user.dto';
 import { AuthService } from './auth.service';
+import {
+  Workspace,
+  WorkspaceDocument,
+} from '../../workspaces/schemas/workspace.schema';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Workspace.name)
+    private workspaceModel: Model<WorkspaceDocument>,
     private readonly authService: AuthService,
   ) {}
 
@@ -45,5 +51,29 @@ export class UserService {
   async exists(userId: string): Promise<boolean> {
     const user = await this.userModel.findById(userId).exec();
     return !!user;
+  }
+
+  async getUserWorkspaces(userId: string): Promise<any[]> {
+    return await this.workspaceModel
+      .aggregate([
+        {
+          $match: { userId }, // Match workspaces belonging to the user
+        },
+        {
+          $lookup: {
+            from: 'messages',
+            let: { workspaceId: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ['$workspaceId', '$$workspaceId'] }, // Match messages for each workspace
+                },
+              },
+            ],
+            as: 'messages', // Include messages associated with each workspace
+          },
+        },
+      ])
+      .exec();
   }
 }
